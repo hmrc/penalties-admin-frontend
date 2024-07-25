@@ -1,0 +1,69 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import navigation._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import components._
+
+@this(layout: HmrcInternalPage, govukTable: GovukTable, govukSummaryList : GovukSummaryList)
+
+@(navigation: PageNavigation, reference: String, data: Seq[(Html,Html)])(implicit request: Request[_], messages: Messages)
+
+@layout(navigation) {
+
+@govukSummaryList(SummaryList(
+  rows = data.map{case (k,v) => SummaryListRow(Key(HtmlContent(k)), Value(HtmlContent(v))) }
+    ++ Seq(
+
+      SummaryListRow(),
+      SummaryListRow(Key(HtmlContent("File URL check")), Value(HtmlContent("""<span id="file-check-status"><span class="spinner">&#10227</span> Checking, please wait...</span>"""))),
+      SummaryListRow(),
+
+      SummaryListRow(
+        actions = Some(Actions(
+          items = Seq(
+            ActionItem(
+              href = "#",
+              content = Text("Retry"),
+              visuallyHiddenText = Some("name")
+            )
+          )
+        ))
+      )
+
+    )
+))
+
+}
+
+<script>
+window.onload = function() {
+  fetch('../check-file-url/@reference').then( response => {
+    var elem = document.getElementById("file-check-status")
+    if (response.status == 408) {
+        var statusChar = "<span class=check-fail>&#10008;</span>";
+        elem.innerHTML = statusChar + " " + response.statusText
+    } else if (response.status == 200) {
+        response.json().then(jsonResponse => {
+            var statusChar = jsonResponse.status == 200 ? "<span class=check-ok>&#10004;</span>" : "<span class=check-fail>&#10008;</span>";
+            elem.innerHTML = statusChar + " " + jsonResponse.statusText
+        })
+    } else {
+        elem.innerHTML = "<span>?</span> Check failed"
+    }
+  });
+}
+</script>

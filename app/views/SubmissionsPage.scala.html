@@ -1,0 +1,72 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import navigation._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import models._
+@import components._
+
+@this(
+  layout: HmrcInternalPage,
+  govukTable: GovukTable,
+  govukPagination : GovukPagination,
+  govukInput: GovukInput
+)
+
+@(navigation: PageNavigation, data: InternalTable.TableData)(implicit request: Request[_], messages: Messages)
+
+@colHead(name: String) = {
+    @defining(name.toLowerCase.replaceAll("[^a-z]+","-").stripSuffix("-")) { symbolicName =>
+      <span>
+            @name
+            <span class="table-header-controls">
+                <a onclick="toggleFilter(event)"><img fetchpriority="high" src="../assets/icons/filter.svg"></a>
+                <a onclick="toggleSort(event)"><img fetchpriority="high" src="../assets/icons/sort.svg"></a>
+            </span>
+      </span>
+      <span class="table-header-filter" style="display:@{ data.filters.find(_.field.symbol == symbolicName).map(_=>"").getOrElse("none") }">
+        @govukInput(Input(id = s"$symbolicName-header-filter", name = s"$symbolicName", classes = "govuk-!-width-full",
+          value = data.filters.find(_.field.symbol == symbolicName).map(_.needle),
+          suffix = Some(PrefixOrSuffix(
+          content = HtmlContent("""<span onclick="filter(event)">&#x1F50D;</span>""")
+        ))))
+      </span>
+    }
+}
+
+@layout(navigation) {
+ @govukTable(Table(
+ rows = data.htmlBody.map{row=>row.map{cell=>TableRow(content = HtmlContent(cell))}},
+ head = Some(data.htmlHeader.map{s=>HeadCell(content = HtmlContent(colHead(s)))}),
+ caption = Some("Penalties Appeal Evidence Submissions"),
+ captionClasses = "govuk-table__caption--m",
+ firstCellIsHeader = true,
+ classes = "govuk-table--small-text-until-tablet"
+ ))
+ @govukPagination(Pagination(
+    items = Some(Seq(
+      PaginationItem(href = "#", number = Some("1")),
+//      PaginationItem(ellipsis = Some(true)),
+//      PaginationItem(href = "#", number = Some("6")),
+//      PaginationItem(href = "#", number = Some("7"), current = Some(true)),
+//      PaginationItem(href = "#", number = Some("8")),
+//      PaginationItem(ellipsis = Some(true)),
+//      PaginationItem(href = "#",  number = Some("42"))
+    )),
+//    previous = Some(PaginationLink(href = "#")),
+//    next = Some(PaginationLink(href = "#"))
+  ))
+}

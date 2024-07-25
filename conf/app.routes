@@ -2,9 +2,14 @@
 
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /                                            controllers.IndexController.onPageLoad()
+->         /hmrc-frontend             hmrcfrontend.Routes
+GET        /                          controllers.AdminController.index()
+GET        /submissions/              controllers.AdminController.submissions(sort: Seq[String], filter: Seq[String], page: Option[Int])
+GET        /submissions/:reference    controllers.AdminController.submission(reference: String)
+GET        /check-file-url/:reference controllers.AdminController.checkFileUrl(reference: String)
+GET        /assets/*file              controllers.Assets.versioned(path = "/public", file: Asset)
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /foo/                                        controllers.IndexController.onPageLoad()
 
 GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 

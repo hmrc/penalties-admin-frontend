@@ -1,0 +1,90 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import config.{FrontendAppConfig=>AppConfig}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.{Footer => GfFooter, Copyright, FooterItem => GfFooterItem, FooterNavigation => GfFooterNavigation, Meta => GfMeta, ContentLicence}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels._
+@import uk.gov.hmrc.govukfrontend.views.implicits._
+@import navigation._
+
+@this(
+  appConfig: AppConfig,
+  hmrcHead: HmrcInternalHead,
+  govukLayout: GovukLayout,
+  hmrcInternalHeader : HmrcInternalHeader,
+  govukBreadcrumbs : GovukBreadcrumbs,
+  govukTable : GovukTable,
+  hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
+  hmrcScripts: HmrcScripts,
+  fixedWidthPageLayout: FixedWidthPageLayout,
+  govukFooter: GovukFooter
+)
+
+@(navigation: PageNavigation)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+
+@headBlock = {
+  @hmrcHead()
+  <link href="/income-tax-penalties-frontend/assets/penalties.css" media="all" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="/income-tax-penalties-frontend/assets/penalties.js"></script>
+}
+
+@headerBlock = {
+  @hmrcInternalHeader(InternalHeader(
+    homepageUrl = "https://www.gov.uk/government/organisations/hm-revenue-customs",
+    serviceName = Some(navigation.serviceName),
+    serviceUrl = "#",
+    useTudorCrown = Some(true)
+  ))
+}
+
+@beforeContent = {
+  @govukBreadcrumbs(Breadcrumbs(items = navigation.breadcrumbTrail()))
+}
+
+@footerBlock = {
+    <footer class="govuk-footer" role="contentinfo">
+        <div class="govuk-width-container">
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <span class="govuk-footer__licence-description">
+                        All content is <b>OFFICIAL</b>, except where otherwise stated.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+}
+
+@govukLayout(
+  headBlock = Some(headBlock),
+  pageTitle = Some("Penalties Appeals Evidence Administration"),
+  headerBlock = Some(headerBlock),
+  scriptsBlock = Some(hmrcScripts()),
+  beforeContentBlock = Some(beforeContent),
+  footerBlock = Some(footerBlock),
+  mainContentLayout = None,
+  assetPath = None,
+  pageLayout = Some(fixedWidthPageLayout(_))
+) {
+  <h1 class="govuk-heading-xl">@{navigation.pageTitle}</h1>
+
+  <p class="govuk-body">@contentBlock</p>
+}

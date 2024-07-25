@@ -1,0 +1,76 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import navigation._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import components._
+
+@this(
+  layout: HmrcInternalPage,
+  govukTable: GovukTable,
+  govukInput: GovukInput,
+  govukAccordion: GovukAccordion,
+  govukFieldset : GovukFieldset,
+  govukButton : GovukButton
+)
+
+@(navigation: PageNavigation)(implicit request: Request[_], messages: Messages)
+
+@html = {
+<p class="govuk-body-l">Please enter any information relating to the submission you are looking for, if any.</p>
+@govukInput(Input(id = "reference", name = "reference", label = Label(content = Text("Submission Reference (optional)"))))
+@govukInput(Input(id = "nino", name = "nino", label = Label(content = Text("Enrolment Key (optional)"))))
+@govukInput(Input(id = "appeal-id", name = "appeal-id", label = Label(content = Text("Appeal Case ID (optional)"))))
+}
+
+@layout(navigation) {
+<form method="get" action="submissions/" onsubmit="return submitSearch()">
+@govukFieldset(Fieldset(
+    legend = Some(Legend(
+      classes = "govuk-fieldset__legend--l",
+      isPageHeading = true
+    )),
+    html = html
+))
+
+  @govukButton(Button(
+    content = Text("Search Submissions")
+  ))
+
+</form>
+}
+
+<script>
+    function submitSearch() {
+        var queryParams = new URLSearchParams();
+
+        var referenceValue = document.getElementById("reference").value;
+        if (referenceValue!="")
+            queryParams.append("filter", encodeURIComponent("reference=" + referenceValue));
+
+        var ninoValue = document.getElementById("nino").value;
+        if (ninoValue!="")
+          queryParams.append("filter", encodeURIComponent("nino=" + ninoValue));
+
+        var appealIdValue = document.getElementById("appeal-id").value;
+        if (appealIdValue!="")
+          queryParams.append("filter", encodeURIComponent("appeal-id=" + appealIdValue));
+
+        var target = "submissions/?" + queryParams.toString();
+        document.location = target;
+        return false;
+    }
+</script>
